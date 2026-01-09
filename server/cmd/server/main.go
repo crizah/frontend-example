@@ -14,11 +14,13 @@ func main() {
 		log.Fatalf("Failed to initialize server: %v", err)
 	}
 
-	http.HandleFunc("/signup", s.HandleSignUp)
-	http.HandleFunc("/login", s.HandleLogin)
+	http.HandleFunc("/signup", s.HandleSignUp) // works
+	http.HandleFunc("/login", s.HandleLogin)   // works
 
 	http.HandleFunc("/profile", s.AuthMiddleware(s.HandleGetProfile))
 	http.HandleFunc("/logout", s.AuthMiddleware(s.HandleLogout))
+
+	http.HandleFunc("/notes", s.AuthMiddleware(s.HandleNotes))
 
 	log.Println("Server starting on :8081")
 	log.Fatal(http.ListenAndServe(":8081", nil))

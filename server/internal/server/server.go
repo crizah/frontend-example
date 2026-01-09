@@ -16,6 +16,7 @@ type Server struct {
 	mongoClient *mongo.Client
 	collUsers   *mongo.Collection
 	collPass    *mongo.Collection
+	collNotes   *mongo.Collection
 	ctx         context.Context
 }
 
@@ -36,8 +37,9 @@ func InitialiseServer(uri string) (*Server, error) {
 	}
 	u := client.Database("Intern").Collection("Users")
 	p := client.Database("Intern").Collection("Pass")
+	n := client.Database("Intern").Collection("Notes")
 
-	return &Server{mongoClient: client, collUsers: u, collPass: p, ctx: ctx}, nil
+	return &Server{mongoClient: client, collUsers: u, collPass: p, collNotes: n, ctx: ctx}, nil
 }
 
 func (s *Server) Close() error {

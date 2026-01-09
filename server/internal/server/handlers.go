@@ -5,6 +5,10 @@ import (
 	"errors"
 	"net/http"
 	"sync"
+	"time"
+
+	"go.mongodb.org/mongo-driver/bson/primitive"
+	"go.mongodb.org/mongo-driver/v2/bson"
 )
 
 var ErrUserNotFound = errors.New("user does not exist")
@@ -242,5 +246,82 @@ func (s *Server) HandleGetProfile(w http.ResponseWriter, r *http.Request) {
 	}
 
 	w.WriteHeader(http.StatusOK)
-	json.NewEncoder(w).Encode(user)
+	json.NewEncoder(w).Encode(map[string]interface{}{
+		"user": user,
+	})
+}
+
+func (s *Server) HandleNotes(w http.ResponseWriter, r *http.Request) {
+	username := r.Context().Value("username").(string)
+
+	switch r.Method {
+
+	case http.MethodGet: // get notes
+		cursor, err := s.collNotes.Find(r.Context(), bson.M{"username": username})
+		if err != nil {
+			http.Error(w, err.Error(), 500)
+			return
+		}
+		var notes []bson.M
+		if err := cursor.All(r.Context(), &notes); err != nil {
+			http.Error(w, err.Error(), 500)
+			return
+		}
+		json.NewEncoder(w).Encode(notes)
+
+	case http.MethodPost: // post
+		var body struct {
+			Text string `json:"text"`
+		}
+		json.NewDecoder(r.Body).Decode(&body)
+
+		note := bson.M{
+			"username":  username,
+			"text":      body.Text,
+			"createdAt": time.Now(),
+		}
+		res, err := s.collNotes.InsertOne(r.Context(), note)
+		if err != nil {
+			http.Error(w, err.Error(), 500)
+			return
+		}
+		note["_id"] = res.InsertedID
+		json.NewEncoder(w).Encode(note)
+
+	case http.MethodPut: // put
+		id := r.URL.Query().Get("id")
+		var body struct {
+			Text string `json:"text"`
+		}
+		json.NewDecoder(r.Body).Decode(&body)
+
+		oid, _ := primitive.ObjectIDFromHex(id)
+		_, err := s.collNotes.UpdateOne(
+			r.Context(),
+			bson.M{"_id": oid, "username": username},
+			bson.M{"$set": bson.M{"text": body.Text}},
+		)
+		if err != nil {
+			http.Error(w, err.Error(), 500)
+			return
+		}
+		w.WriteHeader(http.StatusOK)
+
+	case http.MethodDelete: // delete
+		id := r.URL.Query().Get("id")
+		oid, _ := primitive.ObjectIDFromHex(id)
+
+		_, err := s.collNotes.DeleteOne(
+			r.Context(),
+			bson.M{"_id": oid, "username": username},
+		)
+		if err != nil {
+			http.Error(w, err.Error(), 500)
+			return
+		}
+		w.WriteHeader(http.StatusOK)
+
+	default:
+		w.WriteHeader(http.StatusMethodNotAllowed)
+	}
 }
