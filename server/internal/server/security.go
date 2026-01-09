@@ -6,10 +6,7 @@ import (
 	"encoding/base64"
 	"errors"
 	"io"
-	"os"
-	"time"
 
-	"github.com/golang-jwt/jwt/v5"
 	"golang.org/x/crypto/argon2"
 )
 
@@ -62,15 +59,4 @@ func VerifyPass(password string, salt string, hash string) (bool, error) {
 	}
 	return false, nil
 
-}
-
-func GenerateJWT(username string) (string, error) {
-	claims := jwt.MapClaims{
-		"sub": username,
-		"exp": time.Now().Add(24 * time.Hour).Unix(),
-		"iat": time.Now().Unix(),
-	}
-
-	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
-	return token.SignedString([]byte(os.Getenv("JWT_SECRET")))
 }

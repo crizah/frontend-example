@@ -79,6 +79,17 @@ func (s *Server) AuthMiddleware(next http.HandlerFunc) http.HandlerFunc {
 	}
 }
 
+func GenerateJWT(username string) (string, error) {
+	claims := jwt.MapClaims{
+		"sub": username,
+		"exp": time.Now().Add(24 * time.Hour).Unix(),
+		"iat": time.Now().Unix(),
+	}
+
+	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
+	return token.SignedString([]byte(os.Getenv("JWT_SECRET")))
+}
+
 func VerifyJWT(tokenString string) (string, error) {
 	secret := os.Getenv("JWT_SECRET")
 
@@ -103,7 +114,7 @@ func VerifyJWT(tokenString string) (string, error) {
 		}
 
 		//get username
-		if username, ok := claims["username"].(string); ok {
+		if username, ok := claims["sub"].(string); ok {
 			return username, nil
 		}
 		return "", fmt.Errorf("username not found in token")
