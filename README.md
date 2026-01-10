@@ -1,6 +1,4 @@
-Absolutely! Here's a polished, structured **README** tailored for your project that covers frontend, backend, dashboard, and other key features according to the requirements you provided:
 
-````markdown
 # React Dashboard with JWT Authentication & CRUD Functionality
 
 This project is a full-stack web application featuring a React frontend and a lightweight backend (Go in this implementation, but easily replaceable with Node.js/Express or Python). It demonstrates user authentication using JWT, protected routes, and CRUD operations on a sample entity (Notes).  
@@ -9,51 +7,18 @@ The project is designed with **scalability, security, and responsiveness** in mi
 
 ---
 
-## Table of Contents
-- [Features](#features)  
-- [Frontend](#frontend)  
-- [Backend](#backend)  
-- [Getting Started](#getting-started)  
-- [API Endpoints](#api-endpoints)  
-- [Postman Collection](#postman-collection)  
-- [Project Structure](#project-structure)  
-- [Scaling for Production](#scaling-for-production)  
 
----
 
-## Features
-
-### Frontend
-- Built with **React.js** and **TailwindCSS** for responsive UI  
-- Forms with **client-side validation**  
+## Frontend
+- Built with **React.js** and **TailwindCSS** for responsive UI
+- Responsive with Tailwind  
 - **Protected routes**: Only logged-in users can access dashboard  
 - JWT token stored in **localStorage** for frontend-managed authentication  
 - **Dashboard** with CRUD operations for Notes  
-- Search and filter support for notes  
-- Logout functionality  
+- Logout functionality
 
-### Backend
-- Lightweight backend using **Go** (can be adapted to Node.js/Express or Python)  
-- **JWT-based authentication** for secure login  
-- Passwords hashed with **bcrypt**  
-- REST APIs for:
-  - User signup/login  
-  - Profile fetching/updating  
-  - CRUD operations on notes  
-- Connected to **MongoDB** for persistence  
-- Middleware for **auth validation** and CORS handling  
-
-### Security & Scalability
-- Passwords are **hashed before storage**  
-- **JWT middleware** to protect endpoints  
-- Structured for easy scaling and modularity  
-- Error handling for validation and server errors  
-
----
-
-## Frontend
-
-### Screens
+  
+### Pages
 - **Login / Signup** with email/username and password  
 - **Dashboard** with:
   - Display of user profile  
@@ -65,28 +30,72 @@ The project is designed with **scalability, security, and responsiveness** in mi
 - `react-router-dom` for routing  
 - `TailwindCSS` for styling  
 
----
-
 ## Backend
-
-### JWT Authentication
-- Token issued on login and stored in cookies (or localStorage for frontend-managed auth)  
-- Protected routes require valid JWT token  
-- Middleware verifies token and adds `username` to request context  
+- Lightweight backend using **Go** (can be adapted to Node.js/Express or Python)  
+- **JWT-based authentication** for secure login  
+- Passwords hashed with argon2  
+- REST APIs for:
+  - User signup/login  
+  - Profile fetching/updating  
+  - CRUD operations on notes  
+- Connected to **MongoDB** for persistence  
+- Middleware for **auth validation** and CORS handling
 
 ### CRUD Operations
 - `/notes` (GET, POST)  
 - `/notes/:id` (PUT, DELETE)  
 
-### Example Note Structure
-```json
+### Security & Scalability
+- Passwords are hashed before storage , hashed with a salt
+- hashed with argon2
+- password compared using a cryptographically safe method to prevent time based attacks
+
+- Error handling for validation and server errors (if username or email already exists while signup, checking if user exists before anything)
+- When a user trying to login and they dont exist, return credentials incorrect to prevent attacks
+  
+- JWT middleware to protect endpoints   
+- Token issued on login and stored in cookies
+- Protected routes require valid JWT token  
+- Middleware verifies token and adds `username` to request context  
+
+
+## DB
+- Uses MongoDb for database
+- URI connectes to cluster and the database has 3 collections
+### Users schema
+  ``` 
+  {
+  "_id": crizah,
+  "email": "123@gmail.com",
+  "created_at": ISODate("2024-01-09T10:30:00Z")
+  }
+  ```
+
+ ### Passwords schema
+  ``` 
+  {
+  "_id": crizah,
+  "salt": "4XTWLXe1SBlJFnj2XsqAsg",
+  "hash": "U5H2wl09zw1GTwVnTJ8/7EKE7GbGtEZZReOgFBl3LZA"
+  }
+```
+
+ ### Notes schema (for CRUD)
+ ```
 {
-  "id": "696133819caf51df2eede103",
-  "text": "My first note",
-  "createdAt": "2026-01-09T10:00:00Z",
-  "updatedAt": "2026-01-09T10:00:00Z"
+  "_id": {
+    "$oid": "6961303e9caf51df2eede100"
+  },
+  "username": "c",
+  "text": "hello",
+  "createdAt": {
+    "$date": "2026-01-09T16:43:42.451Z"
+  }
 }
-````
+ 
+```
+  
+ 
 
 ---
 
@@ -101,7 +110,7 @@ The project is designed with **scalability, security, and responsiveness** in mi
 ### Frontend Setup
 
 ```bash
-cd frontend
+cd web
 npm install
 npm start
 ```
@@ -109,8 +118,8 @@ npm start
 ### Backend Setup (Go)
 
 ```bash
-cd backend
-go run main.go
+cd server
+go run ./cmd/server/main.go
 ```
 
 * Backend runs on `http://localhost:8081`
@@ -140,83 +149,20 @@ go run main.go
 
 ---
 
-## Postman Collection
-
-* A ready-to-use Postman collection is included in `/postman` folder
-* Contains all endpoints for authentication and notes CRUD operations
-* Example request body for login/signup:
-
-```json
-{
-  "username": "aa",
-  "password": "hiiii"
-}
-```
-
----
-
-## Project Structure
-
-```
-frontend/
-  src/
-    components/
-      Login.jsx
-      SignUp.jsx
-      Dashboard.jsx
-    App.jsx
-    index.js
-backend/
-  main.go
-  handlers/
-    auth.go
-    notes.go
-  models/
-    user.go
-    note.go
-postman/
-  Dashboard_API_Collection.json
-README.md
-```
-
----
-
 ## Scaling for Production
 
-* Use **nginx** or **Vercel/Netlify** to serve frontend
-* Use **Docker** to containerize backend + MongoDB
-* Enable **HTTPS** for secure token transfer
-* Move JWT storage to **HTTP-only cookies** in production for enhanced security
-* Add **role-based access control** for multi-user applications
-* Separate backend routes into modular controllers for scalability
+- nginx for Frontend Serving
+nginx handles static files more efficiently than Node.js. Its a lightweigh. In production, nginx can handle thousands of concurrent connections while using less memory than application servers.
 
+- Docker Containerization
+Ensures that the application runs perfectly on every machine as it containerises the exaact requirments to run the app. Also supports orchestratioin if we want to make this into a microservice architecture
+
+- HTTPS
+In production, password communication should be done via https to ensure middle aware attack wont leak infomration
+
+- Caching
+Frequently accessed data (user profiles, common queries) can be cached. This reduces database load and response times from 50-100ms down to <5ms.
+
+- Rate Limiting
+Prevents abuse and ensures fair resource allocation. Without it, a single user or bot can overwhelm your server with requests, causing downtime for legitimate users.
 ---
-
-## License
-
-MIT License
-
----
-
-## Author
-
-Your Name
-
-````
-
-This README is **complete**, meets your original requirements, and explains **frontend, backend, CRUD, JWT, and scaling considerations**.  
-
----
-
-If you want, I can also **generate a ready-to-import Postman collection JSON file** for all the endpoints with the exact request bodies like:
-
-```json
-{
-  "username": "aa",
-  "password": "hiiii"
-}
-````
-
-so you can give it directly to reviewers.
-
-Do you want me to do that next?
