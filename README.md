@@ -166,3 +166,17 @@ Frequently accessed data (user profiles, common queries) can be cached. This red
 - Rate Limiting
 Prevents abuse and ensures fair resource allocation. Without it, a single user or bot can overwhelm your server with requests, causing downtime for legitimate users.
 ---
+
+
+## Screenshots
+
+### SignUp page
+<img src="ss/signup.png" width="800" />
+
+### LogIn page
+<img src="ss/login.png" width="800" />
+
+### Dashboard page (CRUD operations)
+<img src="ss/notes.png" width="800" />
+
+  
