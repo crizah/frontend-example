@@ -3,13 +3,12 @@ package main
 import (
 	"log"
 	"net/http"
-	"os"
 	"server/internal/server"
 )
 
 func main() {
-	uri := os.Getenv("MONGODB_URI")
-	s, err := server.InitialiseServer(uri)
+
+	s, err := server.InitialiseServer()
 	if err != nil {
 		log.Fatalf("Failed to initialize server: %v", err)
 	}

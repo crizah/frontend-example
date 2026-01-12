@@ -1,0 +1,31 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: server-deployment
+  labels:
+    app: server
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: server
+  template:
+    metadata:
+      labels:
+        app: server
+    spec:
+      containers:
+      - name: server
+        image: shaizah/kube:backend
+        ports:
+        - containerPort: 8081
+        env:
+          - name: MONGODB_URI
+            value: mongodb+srv://shaizahlabique:Mooshy12.34@cluster0.d9fzhp3.mongodb.net/?appName=Cluster0
+          - name: JWT_SECRET
+            value: w8yNRylxWJAsK2SxIZpJ1SQKDxGFxtwhIPdmXcdLqJP
+
+
+
+
+

@@ -20,7 +20,8 @@ type Server struct {
 	ctx         context.Context
 }
 
-func InitialiseServer(uri string) (*Server, error) {
+func InitialiseServer() (*Server, error) {
+	uri := os.Getenv("MONGODB_URI")
 
 	clientOptions := options.Client().ApplyURI(uri)
 
