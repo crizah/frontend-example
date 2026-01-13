@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"errors"
 	"net/http"
+	"os"
 	"sync"
 	"time"
 
@@ -14,8 +15,10 @@ import (
 var ErrUserNotFound = errors.New("user does not exist")
 
 func (s *Server) HandleSignUp(w http.ResponseWriter, r *http.Request) {
+
+	client_ip := os.Getenv("CLIENT_IP")
 	// user gives username, email and password
-	w.Header().Set("Access-Control-Allow-Origin", "http://localhost:3000")
+	w.Header().Set("Access-Control-Allow-Origin", client_ip)
 	w.Header().Set("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS")
 	w.Header().Set("Access-Control-Allow-Headers", "Content-Type, Authorization")
 	w.Header().Set("Access-Control-Allow-Credentials", "true")
@@ -94,7 +97,9 @@ func (s *Server) HandleSignUp(w http.ResponseWriter, r *http.Request) {
 }
 
 func (s *Server) HandleLogin(w http.ResponseWriter, r *http.Request) {
-	w.Header().Set("Access-Control-Allow-Origin", "http://localhost:3000")
+
+	client_ip := os.Getenv("CLIENT_IP")
+	w.Header().Set("Access-Control-Allow-Origin", client_ip)
 	w.Header().Set("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS")
 	w.Header().Set("Access-Control-Allow-Headers", "Content-Type, Authorization")
 	w.Header().Set("Access-Control-Allow-Credentials", "true")
@@ -217,7 +222,9 @@ func (s *Server) HandleLogin(w http.ResponseWriter, r *http.Request) {
 }
 
 func (s *Server) HandleLogout(w http.ResponseWriter, r *http.Request) {
-	w.Header().Set("Access-Control-Allow-Origin", "http://localhost:3000")
+
+	client_ip := os.Getenv("CLIENT_IP")
+	w.Header().Set("Access-Control-Allow-Origin", client_ip)
 	w.Header().Set("Access-Control-Allow-Credentials", "true")
 
 	// clear the cookie
@@ -252,6 +259,8 @@ func (s *Server) HandleGetProfile(w http.ResponseWriter, r *http.Request) {
 }
 
 func (s *Server) HandleNotes(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json")
+
 	username := r.Context().Value("username").(string)
 
 	switch r.Method {
@@ -305,7 +314,10 @@ func (s *Server) HandleNotes(w http.ResponseWriter, r *http.Request) {
 			http.Error(w, err.Error(), 500)
 			return
 		}
+
+		w.Header().Set("Content-Type", "application/json")
 		w.WriteHeader(http.StatusOK)
+		json.NewEncoder(w).Encode(body.Text)
 
 	case http.MethodDelete: // delete
 		id := r.URL.Query().Get("id")

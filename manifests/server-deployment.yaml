@@ -16,15 +16,31 @@ spec:
     spec:
       containers:
       - name: server
-        image: shaizah/kube:backend
+        image: shaizah/kube:backend-v2
         ports:
         - containerPort: 8081
         env:
           - name: MONGODB_URI
-            value: mongodb+srv://shaizahlabique:Mooshy12.34@cluster0.d9fzhp3.mongodb.net/?appName=Cluster0
+            valueFrom:
+              secretKeyRef:
+                name: backend-secrets
+                key: MONGODB_URI
           - name: JWT_SECRET
-            value: w8yNRylxWJAsK2SxIZpJ1SQKDxGFxtwhIPdmXcdLqJP
-
+            valueFrom:
+              secretKeyRef:
+                name: backend-secrets
+                key: JWT_SECRET
+          - name: CLIENT_IP
+            valueFrom:
+              secretKeyRef:
+                name: backend-secrets
+                key: CLIENT_IP
+          - name: REACT_APP_BACKEND_URL
+            valueFrom:
+              secretKeyRef:
+                name: backend-secrets
+                key: REACT_APP_BACKEND_URL
+          
 
 
 

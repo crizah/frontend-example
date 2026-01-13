@@ -5,6 +5,7 @@ import "./index.css";
 
 export function DashBoard() {
   const navigate = useNavigate();
+  const x = process.env.REACT_APP_BACKEND_URL;
 
   const [createdAt, setCreatedAt] = useState("");
   const [notes, setNotes] = useState([]);      // always array
@@ -15,7 +16,7 @@ export function DashBoard() {
   // profile
   useEffect(() => {
     axios
-      .get("http://localhost:8081/profile", { withCredentials: true })
+      .get(`${x}/profile`, { withCredentials: true })
       .then(res => setCreatedAt(res.data.user))
       .catch(() => navigate("/"));
   }, [navigate]);
@@ -23,7 +24,7 @@ export function DashBoard() {
   // read notes
   useEffect(() => {
     axios
-      .get("http://localhost:8081/notes", { withCredentials: true })
+      .get(`${x}/notes`, { withCredentials: true })
       .then(res => setNotes(Array.isArray(res.data) ? res.data : []));
   }, []);
 
@@ -32,7 +33,7 @@ export function DashBoard() {
     if (!text.trim()) return;
 
     const res = await axios.post(
-      "http://localhost:8081/notes",
+      `${x}/notes`,
       { text },
       { withCredentials: true }
     );
@@ -44,14 +45,14 @@ export function DashBoard() {
   // update
   const updateNote = async () => {
     await axios.put(
-      `http://localhost:8081/notes?id=${editId}`,
+      `${x}/notes?id=${editId}`,
       { text: editText },
       { withCredentials: true }
     );
 
     setNotes(
       notes.map(n =>
-        n._id === editId ? { ...n, text: editText } : n
+        n._id.toString() === editId ? { ...n, text: editText } : n
       )
     );
 
@@ -62,15 +63,15 @@ export function DashBoard() {
   // delete
   const deleteNote = async (id) => {
     await axios.delete(
-      `http://localhost:8081/notes?id=${id}`,
+      `${x}/notes?id=${id}`,
       { withCredentials: true }
     );
 
-    setNotes(notes.filter(n => n._id !== id));
+    setNotes(notes.filter(n => n._id.toString() !== id));
   };
 
   const logout = async () => {
-    await axios.get("http://localhost:8081/logout", {
+    await axios.get(`${x}/logout`, {
       withCredentials: true
     });
     navigate("/");

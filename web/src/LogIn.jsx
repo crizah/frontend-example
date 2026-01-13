@@ -6,6 +6,7 @@ import "./index.css";
 
 export function Login() {
   const navigate = useNavigate();
+  const x = process.env.REACT_APP_BACKEND_URL;
   const [formData, setFormData] = useState({
     identifier: "",
     password: ""
@@ -22,7 +23,7 @@ export function Login() {
 
     try {
       await axios.post(
-        "http://localhost:8081/login",
+        `${x}/login`,
         isEmail
           ? { email: formData.identifier, password: formData.password }
           : { username: formData.identifier, password: formData.password },

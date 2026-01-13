@@ -16,6 +16,9 @@ spec:
     spec:
       containers:
       - name: server
-        image: shaizah/kube:frontend
+        image: shaizah/kube:frontend-v2
         ports:
         - containerPort: 3000
+        env:
+        - name: REACT_APP_BACKEND_URL
+          value: "http://server-service:8081"

@@ -4,9 +4,12 @@ import (
 	"log"
 	"net/http"
 	"server/internal/server"
+
+	"github.com/joho/godotenv"
 )
 
 func main() {
+	godotenv.Load()
 
 	s, err := server.InitialiseServer()
 	if err != nil {
