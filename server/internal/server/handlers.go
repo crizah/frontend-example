@@ -224,6 +224,12 @@ func (s *Server) HandleLogin(w http.ResponseWriter, r *http.Request) {
 	// generate jwt
 
 	token, err := GenerateJWT(username)
+	secure := os.Getenv("SECURE")
+	sec := false
+
+	if secure == "true" {
+		sec = true
+	}
 
 	// set as cookie
 	http.SetCookie(w, &http.Cookie{
@@ -231,7 +237,7 @@ func (s *Server) HandleLogin(w http.ResponseWriter, r *http.Request) {
 		Value:    token,
 		Path:     "/",
 		HttpOnly: true,
-		Secure:   true, // HTTPS in prod
+		Secure:   sec, // false only in kubernetes
 		SameSite: http.SameSiteLaxMode,
 		MaxAge:   86400,
 	})
