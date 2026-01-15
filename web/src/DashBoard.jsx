@@ -5,7 +5,9 @@ import "./index.css";
 
 export function DashBoard() {
   const navigate = useNavigate();
-  const x = process.env.REACT_APP_BACKEND_URL;
+  // const x = process.env.REACT_APP_BACKEND_URL;
+  const x = window.RUNTIME_CONFIG.BACKEND_URL;
+
 
   const [createdAt, setCreatedAt] = useState("");
   const [notes, setNotes] = useState([]);      // always array

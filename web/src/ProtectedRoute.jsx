@@ -4,10 +4,12 @@ import { useEffect, useState } from "react";
 
 export const ProtectedRoute = ({ children }) => {
   const [ok, setOk] = useState(null);
+  const x = window.RUNTIME_CONFIG.BACKEND_URL;
+
 
   useEffect(() => {
     axios
-      .get("http://localhost:8081/profile", { withCredentials: true })
+      .get(`${x}/profile`, { withCredentials: true })
       .then(() => setOk(true))
       .catch(() => setOk(false));
   }, []);

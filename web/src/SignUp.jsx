@@ -16,7 +16,9 @@ export function SignUp() {
   const [isLoading, setIsLoading] = useState(false);
     const [focusedField, setFocusedField] = useState(null);
   const navigate = useNavigate();
-  const x = process.env.REACT_APP_BACKEND_URL;
+  // const x = process.env.REACT_APP_BACKEND_URL;
+  const x = window.RUNTIME_CONFIG.BACKEND_URL;
+
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData((prev) => ({

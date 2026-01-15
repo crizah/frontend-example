@@ -53,9 +53,16 @@ func (s *Server) Close() error {
 }
 
 func (s *Server) AuthMiddleware(next http.HandlerFunc) http.HandlerFunc {
+
 	return func(w http.ResponseWriter, r *http.Request) {
-		client_ip := os.Getenv("CLIENT_IP")
-		w.Header().Set("Access-Control-Allow-Origin", client_ip)
+		origin := r.Header.Get("Origin")
+		if allowedOrigins[origin] {
+			w.Header().Set("Access-Control-Allow-Origin", origin)
+
+		}
+
+		// client_ip := os.Getenv("CLIENT_IP")
+		// w.Header().Set("Access-Control-Allow-Origin", client_ip)
 		w.Header().Set("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS")
 		w.Header().Set("Access-Control-Allow-Headers", "Content-Type, Authorization")
 		w.Header().Set("Access-Control-Allow-Credentials", "true")

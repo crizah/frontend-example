@@ -14,11 +14,31 @@ import (
 
 var ErrUserNotFound = errors.New("user does not exist")
 
+var allowedOrigins = map[string]bool{
+	"http://localhost:3000": true,
+	os.Getenv("CLIENT_IP"):  true,
+	// "http://myapp.local":    true,
+	"http://localhost:80": true,
+	// Add your node IP
+	"http://192.168.49.2:30100": true,
+	"http://app-service:80":     true,
+	"http://localhost:30100":    true, // For localhost access
+	"http://127.0.0.1:30100":    true, // Alternative localhost
+	"http://10.12.28.94:30100":  true, // Your machine's IP
+	"http://localhost:8081":     true,
+}
+
 func (s *Server) HandleSignUp(w http.ResponseWriter, r *http.Request) {
 
-	client_ip := os.Getenv("CLIENT_IP")
+	// client_ip := os.Getenv("CLIENT_IP")
 	// user gives username, email and password
-	w.Header().Set("Access-Control-Allow-Origin", client_ip)
+
+	origin := r.Header.Get("Origin")
+	if allowedOrigins[origin] {
+		w.Header().Set("Access-Control-Allow-Origin", origin)
+
+	}
+
 	w.Header().Set("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS")
 	w.Header().Set("Access-Control-Allow-Headers", "Content-Type, Authorization")
 	w.Header().Set("Access-Control-Allow-Credentials", "true")
@@ -98,8 +118,12 @@ func (s *Server) HandleSignUp(w http.ResponseWriter, r *http.Request) {
 
 func (s *Server) HandleLogin(w http.ResponseWriter, r *http.Request) {
 
-	client_ip := os.Getenv("CLIENT_IP")
-	w.Header().Set("Access-Control-Allow-Origin", client_ip)
+	origin := r.Header.Get("Origin")
+	if allowedOrigins[origin] {
+		w.Header().Set("Access-Control-Allow-Origin", origin)
+
+	}
+
 	w.Header().Set("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS")
 	w.Header().Set("Access-Control-Allow-Headers", "Content-Type, Authorization")
 	w.Header().Set("Access-Control-Allow-Credentials", "true")
@@ -222,9 +246,11 @@ func (s *Server) HandleLogin(w http.ResponseWriter, r *http.Request) {
 }
 
 func (s *Server) HandleLogout(w http.ResponseWriter, r *http.Request) {
+	origin := r.Header.Get("Origin")
+	if allowedOrigins[origin] {
+		w.Header().Set("Access-Control-Allow-Origin", origin)
 
-	client_ip := os.Getenv("CLIENT_IP")
-	w.Header().Set("Access-Control-Allow-Origin", client_ip)
+	}
 	w.Header().Set("Access-Control-Allow-Credentials", "true")
 
 	// clear the cookie

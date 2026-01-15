@@ -1,16 +1,37 @@
+# # build
+# FROM node:18.19.1 AS build
+# WORKDIR /app
+# COPY package*.json ./
+# RUN npm install
+# COPY . .
+# RUN npm run build
 
-FROM node:18.19.1
+# # runtime
+# FROM nginx:alpine
+# COPY --from=build /app/build /usr/share/nginx/html
+# COPY public/config.js /usr/share/nginx/html/config.js
+# COPY entrypoint.sh /entrypoint.sh
+# RUN chmod +x /entrypoint.sh
 
+# EXPOSE 80
+# CMD ["/entrypoint.sh"]
+
+
+# build
+FROM node:18.19.1 AS build
 WORKDIR /app
-
-
-COPY package.json ./
-COPY package-lock.json ./
 COPY package*.json ./
-
 RUN npm install
-
 COPY . .
-EXPOSE 3000
+RUN npm run build
 
-CMD ["npm", "start"]
+# runtime
+FROM nginx:alpine
+# install envsubst
+RUN apk add --no-cache gettext
+COPY --from=build /app/build /usr/share/nginx/html
+COPY public/config.js /usr/share/nginx/html/config.js
+COPY entrypoint.sh /entrypoint.sh
+RUN chmod +x /entrypoint.sh
+EXPOSE 80
+CMD ["/entrypoint.sh"]
